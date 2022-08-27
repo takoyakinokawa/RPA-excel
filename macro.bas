@@ -1,7 +1,6 @@
 Attribute VB_Name = "macro"
 '‰ïĞ‚ğ’T‚·ŠÖ”
 Sub Search_Company()
-    
     Dim lastrow
     
     For i = 2 To Worksheets("U•\").Cells(Rows.Count, "B").End(xlUp).Row
@@ -70,6 +69,9 @@ Sub loading(first_column As Integer, mon As Integer, name As String)
     For i = first_column To Worksheets(name).Cells(temp, 1).End(xlUp).Row + 1
         temp = Month(Worksheets(name).Cells(i, "A"))
         
+        If mon = 3 Then
+            March (mon), (name), (i)
+        End If
         'Œ‚ª•Ï‚í‚ç‚È‚¢ê‡
         If mon = temp Then
             num = num + 1
@@ -81,26 +83,20 @@ Sub loading(first_column As Integer, mon As Integer, name As String)
             Debug.Print "i : " & i
             num = 0
             
-            money = Worksheets(name).Cells(i - 1, "I")
-            If money = 0 Then
-                money = ""
-            End If
+            money = Get_Money(name, i - 1)
             
             Debug.Print "money : " & money
             
-            For a = 2 To Cells(Rows.Count, 1).End(xlUp).Row + 2
-                        
-                '‰ïĞ‚Ì‘ÎÛ‚Ì‰ïĞ‚ª‹LÚ‚³‚ê‚Ä‚¢‚és‚ğæ“¾
-                If Worksheets("U•\").Cells(a, "B") = name Then
-                    column_num = a
-                End If
-            Next
+            column_num = Search_Row(name)
             
             monID = Get_Month_Cell(mon)
             
-            Worksheets("U•\").Cells(column_num, monID) = money
+            If Not monID = "" Then
+                Worksheets("U•\").Cells(column_num, monID) = money
+            End If
             
             mon = Month(Worksheets(name).Cells(i, "A"))
+
             loading (i), (mon), (name)
         End If
     Next
@@ -145,4 +141,45 @@ Function Get_Month_Cell(mon) As String
     
     Get_Month_Cell = monID
     
+End Function
+Sub March(mon, name, i)
+    
+    init = 20
+    
+    If Day(Worksheets(name).Cells(i, "A")) = init Then
+
+        money = Get_Money(name, i)
+        column_num = Search_Row(name)
+        
+        Worksheets("U•\").Cells(column_num, "Z") = money
+
+    End If
+    If Day(Worksheets(name).Cells(i, "A")) = 31 Then
+
+        money = Get_Money(name, i)
+        column_num = Search_Row(name)
+        
+        money = money - Worksheets("U•\").Cells(column_num, "Z")
+        Worksheets("U•\").Cells(column_num, "AA") = money
+        
+    End If
+    
+End Sub
+Function Get_Money(name, i)
+    money = Worksheets(name).Cells(i, "I")
+    If money = 0 Then
+        money = ""
+    End If
+    Debug.Print "money : " & money
+    Get_Money = money
+End Function
+Function Search_Row(name)
+
+    For A = 2 To Worksheets("U•\").Cells(Rows.Count, 1).End(xlUp).Row + 2
+            
+        'U•\‚Å‘ÎÛ‚Ì‰ïĞ‚ª‹LÚ‚³‚ê‚Ä‚¢‚és‚ğæ“¾
+        If Worksheets("U•\").Cells(A, "B") = name Then
+            Search_Row = A
+        End If
+    Next
 End Function
